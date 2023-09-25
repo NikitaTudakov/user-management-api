@@ -23,7 +23,7 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  async update(id: number, updateUserDto: User) {
+  async update(id: string, updateUserDto: User) {
     const options: FindOneOptions<User> = {
       where: { id },
     };
@@ -38,7 +38,7 @@ export class UsersService {
 
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const options: FindOneOptions<User> = {
       where: { id },
     };
