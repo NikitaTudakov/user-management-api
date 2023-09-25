@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -10,6 +10,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
   create(userDto: User): Promise<User> {
     return this.userRepository.save(userDto);
   }
@@ -22,11 +23,32 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: any) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: User) {
+    const options: FindOneOptions<User> = {
+      where: { id },
+    };
+  
+    const user = await this.userRepository.findOne(options);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return await this.userRepository.update(id,updateUserDto);
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const options: FindOneOptions<User> = {
+      where: { id },
+    };
+  
+    const user = await this.userRepository.findOne(options);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return await this.userRepository.delete(id);
   }
 }
