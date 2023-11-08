@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { LoginForm } from './interfaces/loginForm';
+import { SECRET_KEY } from '../../constants';
 
 @Injectable()
 export class AuthService {
@@ -22,12 +23,12 @@ export class AuthService {
         if(user) {
             throw new NotFoundException('User is already exist');
         } else {
-            await this.userRepository.save(registrationData);
-            return true
+            const newUser = await this.userRepository.save(registrationData);
+            const payload = {username: newUser.login, sub: newUser.id};
+            const accessToken = await this.jwtService.signAsync(payload);
+            return { accessToken }
         }
-        // Создание пользователя и сохранение его в базе данных
         // Хеширование пароля перед сохранением
-        // Генерация JWT токена и его возврат
     }
       
     async login(loginData: LoginForm) {
@@ -42,6 +43,15 @@ export class AuthService {
             return { accessToken }
         } else {
             throw new UnauthorizedException('Invalid credentials');
+        }
+    }
+
+    async validateToken(accessToken: string) {
+        try {
+            await this.jwtService.verifyAsync(accessToken,{secret: SECRET_KEY});
+            return true
+        } catch {
+            return false
         }
     }
 }

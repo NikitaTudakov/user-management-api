@@ -1,7 +1,8 @@
 import { JwtModuleOptions } from "@nestjs/jwt";
+import { SECRET_KEY } from "./constants";
 
 export const jwtTokenConfig = {
     global: true,
-    secret: "TSeNqBhSXytDd5xuMbE3DIshDKjKZj3C",
-    signOptions: { expiresIn: '60s' },
+    secret: SECRET_KEY,
+    signOptions: { expiresIn: '24h' },
 } as JwtModuleOptions;

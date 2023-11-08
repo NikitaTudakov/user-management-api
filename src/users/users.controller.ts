@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
-    @Post()
+    @Post('/new-user')
     create(@Body() userDto: User) {
         return this.usersService.create(userDto);
     }
@@ -17,8 +19,8 @@ export class UsersController {
     }
 
     @Put('/:id')
-    update(@Param('id') id: string, @Body() updateUserDto: User) {
-        return this.usersService.update(id, updateUserDto);
+    update(@Param('id') id: string, @Body() userDto: Partial<User>) {
+        return this.usersService.update(id, userDto);
     }
 
     @Delete('/:id')
