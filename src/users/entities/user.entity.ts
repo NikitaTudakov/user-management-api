@@ -19,4 +19,10 @@ export class User {
 
     @Column()
     phoneNumber: string;
+
+    @Column()
+    login: string;
+
+    @Column()
+    password: string;
 }
