@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { User } from './entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -19,12 +20,18 @@ export class UsersService {
         if(user) {
             throw new BadRequestException('User is already exist');
         } else {
+            const password = userDto.password;
+            const salt = await bcrypt.genSalt();
+            const hash = await bcrypt.hash(password, salt);
+            userDto.password = hash;
             return this.userRepository.save(userDto);
         }
     }
 
     findAll(): Promise<User[]> {
-        return this.userRepository.find();
+        return this.userRepository.find({
+            select: ['id','login', 'name', 'surname', 'age', 'email', 'phoneNumber'],
+        });
     }
 
     async update(id: string, updateUserDto: Partial<User>) {

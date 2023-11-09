@@ -5,6 +5,7 @@ import { User } from 'src/users/entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { LoginForm } from './interfaces/loginForm';
 import { SECRET_KEY } from '../../constants';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -23,24 +24,34 @@ export class AuthService {
         if(user) {
             throw new NotFoundException('User is already exist');
         } else {
+            const password = registrationData.password;
+            const salt = await bcrypt.genSalt();
+            const hash = await bcrypt.hash(password, salt);
+            registrationData.password = hash;
             const newUser = await this.userRepository.save(registrationData);
             const payload = {username: newUser.login, sub: newUser.id};
             const accessToken = await this.jwtService.signAsync(payload);
             return { accessToken }
         }
-        // Хеширование пароля перед сохранением
     }
       
     async login(loginData: LoginForm) {
         const options: FindOneOptions<User> = {
-            where: { ...loginData }
+            where: { login: loginData.login }
         };
         const user = await this.userRepository.findOne(options);
 
         if(user) {
-            const payload = {username: user.login, sub: user.id};
-            const accessToken = await this.jwtService.signAsync(payload);
-            return { accessToken }
+            const password = loginData.password;
+            const hash = user.password;
+            const isMatch = await bcrypt.compare(password, hash);
+            if(isMatch) {
+                const payload = {username: user.login, sub: user.id};
+                const accessToken = await this.jwtService.signAsync(payload);
+                return { accessToken }
+            } else {
+                throw new UnauthorizedException('Invalid credentials');
+            }
         } else {
             throw new UnauthorizedException('Invalid credentials');
         }
