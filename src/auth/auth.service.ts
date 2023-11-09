@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
@@ -22,7 +22,7 @@ export class AuthService {
         const user = await this.userRepository.findOne(options);
 
         if(user) {
-            throw new NotFoundException('User is already exist');
+            throw new ForbiddenException('User is already exist');
         } else {
             const password = registrationData.password;
             const salt = await bcrypt.genSalt();
@@ -53,7 +53,7 @@ export class AuthService {
                 throw new UnauthorizedException('Invalid credentials');
             }
         } else {
-            throw new UnauthorizedException('Invalid credentials');
+            throw new NotFoundException('User not found');
         }
     }
 
