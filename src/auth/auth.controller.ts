@@ -22,4 +22,14 @@ export class AuthController {
     validate(@Body() data: {accessToken: string}): Promise<boolean> {
         return this.authService.validateToken(data.accessToken);
     }
+
+    @Post('/forgot-password')
+    forgotPassword(@Body() data: {email: string}): Promise<NotFoundException | string> {
+        return this.authService.forgotPassword(data.email);
+    }
+
+    @Post('/reset-password')
+    resetPassword(@Body() data: {password: string, token: string}): Promise<UnauthorizedException | string> {
+        return this.authService.resetPassword(data.password, data.token);
+    }
 }

@@ -7,6 +7,7 @@ import { connectionOptions } from 'ormconfig';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
 import { jwtTokenConfig } from 'jwtTokenConfig';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
     imports: [
@@ -14,6 +15,9 @@ import { jwtTokenConfig } from 'jwtTokenConfig';
         AuthModule,
         TypeOrmModule.forRoot(connectionOptions),
         JwtModule.register(jwtTokenConfig),
+        ConfigModule.forRoot({
+            envFilePath: 'config.env',
+          })
     ],
     controllers: [AppController],
     providers: [AppService],
