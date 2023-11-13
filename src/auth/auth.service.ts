@@ -78,11 +78,11 @@ export class AuthService {
 
         if(user) {
             const payload = {username: user.login, sub: user.id};
-            const accessToken = await this.jwtService.signAsync(payload);
+            const accessToken = await this.jwtService.signAsync(payload,{expiresIn: '30m'});
             const clientAppUrl = this.configService.get<string>('CLIENT_APP_URL');
             return await this.emailService.sendResetPasswordEmail(
                 email,
-                `${clientAppUrl}/reset-password/${accessToken}`
+                `${clientAppUrl}/reset-password?accessToken=${accessToken}`
             );
         } else {
             throw new NotFoundException('User not found');

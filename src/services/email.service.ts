@@ -25,7 +25,12 @@ export class EmailService {
             from: originEmail,
             to: email,
             subject: 'Invetorsoft Test App: Password Reset Instructions',
-            html: `<p>Click the following link to reset your password: <a href="${resetLink}">reset link</a></p>`,
+            html: `<p>Click the following link to reset your password: <a href="${resetLink}">reset link</a>
+                <br><br>
+                Link should be valid for 1 hour.
+                <br><br>
+                If link doesn't work, copy and paste the following link in your browser: ${resetLink}
+            </p>`,
         };
 
         try {
