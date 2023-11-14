@@ -13,11 +13,17 @@ export class UsersService {
     ) {}
 
     async create(userDto: User): Promise<User> {
-        const options: FindOneOptions<User> = {
+        const loginOptions: FindOneOptions<User> = {
             where: { login: userDto.login }
         };
-        const user = await this.userRepository.findOne(options);
-        if(user) {
+        const emailOptions: FindOneOptions<User> = {
+            where: { email: userDto.email }
+        };
+
+        const userWithLogin = await this.userRepository.findOne(loginOptions);
+        const userWithEmail = await this.userRepository.findOne(emailOptions);
+
+        if(userWithLogin || userWithEmail) {
             throw new BadRequestException('User is already exist');
         } else {
             const password = userDto.password;

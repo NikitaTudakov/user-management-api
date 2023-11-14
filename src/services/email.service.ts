@@ -8,6 +8,7 @@ export class EmailService {
 
     constructor(private configService: ConfigService){}
 
+    // send email with reset password link
     async sendResetPasswordEmail(email: string, resetLink: string): Promise<string> {
         const originEmail = this.configService.get<string>('ORIGIN_EMAIL');
         const originPass = this.configService.get<string>('ORIGIN_EMAL_PASS');

@@ -19,13 +19,20 @@ export class AuthService {
         private configService: ConfigService
     ) {}
 
+    // registration user
     async register(registrationData: User) {
-        const options: FindOneOptions<User> = {
+        const loginOptions: FindOneOptions<User> = {
           where: { login: registrationData.login }
         };
-        const user = await this.userRepository.findOne(options);
 
-        if(user) {
+        const emailOptions: FindOneOptions<User> = {
+            where: { email: registrationData.email }
+        };
+
+        const userWithLogin = await this.userRepository.findOne(loginOptions);
+        const userWithEmail = await this.userRepository.findOne(emailOptions);
+
+        if(userWithLogin || userWithEmail) {
             throw new ForbiddenException('User is already exist');
         } else {
             const password = registrationData.password;
@@ -38,7 +45,8 @@ export class AuthService {
             return { accessToken }
         }
     }
-      
+    
+    // login user
     async login(loginData: LoginForm) {
         const options: FindOneOptions<User> = {
             where: { login: loginData.login }
@@ -61,6 +69,7 @@ export class AuthService {
         }
     }
 
+    // validate user
     async validateToken(accessToken: string) {
         try {
             await this.jwtService.verifyAsync(accessToken,{secret: SECRET_KEY});
@@ -70,6 +79,7 @@ export class AuthService {
         }
     }
 
+    // forgot password and send email with reset link
     async forgotPassword(email: string): Promise<string> {
         const options: FindOneOptions<User> = {
             where: { email: email }
@@ -89,9 +99,9 @@ export class AuthService {
         }
     }
 
+    // reset password
     async resetPassword( newPassword: string,accessToken: string): Promise<string> {
         const payload = await this.jwtService.verifyAsync(accessToken,{secret: SECRET_KEY});
-        //will be added validation for token expiration
         const options: FindOneOptions<User> = {
             where: { id: payload.sub }
         };
