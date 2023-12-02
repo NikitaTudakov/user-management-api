@@ -25,7 +25,7 @@ export class EmailService {
         const mailOptions = {
             from: originEmail,
             to: email,
-            subject: 'Invetorsoft Test App: Password Reset Instructions',
+            subject: 'Inventorsoft Test App: Password Reset Instructions',
             html: `<p>Click the following link to reset your password: <a href="${resetLink}">reset link</a>
                 <br><br>
                 Link should be valid for 1 hour.
